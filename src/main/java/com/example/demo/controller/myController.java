@@ -4,13 +4,23 @@ package com.example.demo.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
-import java.nio.channels.SocketChannel;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 
 import static java.lang.Thread.sleep;
 
@@ -25,28 +35,32 @@ public class myController {
     }
 
     @RequestMapping("/access-url")
-    public String accessUrl(String url) {
+    public String accessUrl(@RequestParam String url) {
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .connectTimeout(10_000, TimeUnit.MILLISECONDS)
+                .build();
+
         try {
-            URL urlObject = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
-            connection.setRequestMethod("GET");
-            int responseCode = connection.getResponseCode();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .build();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-            connection.disconnect();
+            Response response = httpClient.newCall(request).execute();
 
+            int responseCode = response.code();
+            String responseBody = response.body() != null ? response.body().string() : "";
+
+            response.close();
+
+            // You can replace "logger" with your actual logger instance
             logger.info("Accessed URL: " + url);
             logger.info("Response Code: " + responseCode);
-            logger.info("Response Body: " + response.toString());
+            logger.info("Response Body: " + responseBody);
 
-            return response.toString();
-        } catch (Exception e) {
+            return responseBody;
+        } catch (IOException e) {
+            // You can replace "logger" with your actual logger instance
             logger.error("Error accessing URL: " + url, e);
             return "Error accessing URL: " + url;
         }
