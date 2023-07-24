@@ -23,10 +23,15 @@ import okhttp3.Response;
 
 
 import static java.lang.Thread.sleep;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
+@Api(value = "Net Rest API", tags = {"Net"})
 @RestController
 public class myController {
-    private final static Logger logger = LoggerFactory.getLogger(myController .class);
+    private final static Logger logger = LoggerFactory.getLogger(myController.class);
+
+    @ApiOperation(value = "Hello 日志")
     @RequestMapping("/hello")
     public String firstFromWebsite(){
         logger.info("hello,spring boot!xxxxxxxxxxxxxxxxxxxxxxxxxx");
@@ -34,6 +39,7 @@ public class myController {
         return "hello,spring boot!";
     }
 
+    @ApiOperation(value = "转发请求")
     @RequestMapping("/access-url")
     public String accessUrl(@RequestParam String url) {
         OkHttpClient httpClient = new OkHttpClient.Builder()
@@ -66,6 +72,7 @@ public class myController {
         }
     }
 
+    @ApiOperation(value = "等待N毫秒返回")
     @RequestMapping("/sleepTime")
     public String sleepTime(int sleepTime){
         logger.info("sleep start!");
