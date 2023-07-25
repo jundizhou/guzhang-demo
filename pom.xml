@@ -68,5 +68,12 @@
             </plugin>
         </plugins>
     </build>
-
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun</id>
+            <name>aliyun maven plugin</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </pluginRepository>
+        <!-- 可以添加其他的 Maven 插件仓库配置 -->
+    </pluginRepositories>
 </project>
